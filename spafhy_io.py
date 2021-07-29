@@ -1698,3 +1698,51 @@ def get_clear_cuts(pgen, cmask):
             print ('No available clear-cut scenario rasters in ', pgen['gis_scenarios'])
 
     return clear_cuts
+
+def weather_fig(df):
+
+    sns.set()
+    #import string
+    #printable = set(string.printable)
+    fs=12
+    fig = plt.figure(num='Susi - weather data', figsize=[15.,8.], facecolor='#C1ECEC')  #see hex color codes from https://www.rapidtables.com/web/color/html-color-codes.html
+    municipality = df['Kunta'][0]   
+    #fig.suptitle('Weather data, '+ filter(lambda x: x in printable, municipality), fontsize=18)
+    ax1 = fig.add_axes([0.05,0.55,0.6,0.35])                             #left, bottom, width, height
+    ax1.plot(df.index, df['Prec'].values, 'b-', label='Rainfall')
+    ax1.set_xlabel('Time', fontsize=fs)
+    ax1.set_ylabel('Rainfall, mm', fontsize=12)
+    ax1.legend(loc='upper left')
+    ax11 = ax1.twinx()
+    ax11.plot(df.index, np.cumsum(df['Prec'].values), 'm-', linewidth=2., label='Cumulative rainfall')
+    ax11.set_ylabel('Cumulative rainfall [mm]', fontsize = fs)
+    ax11.legend(loc='upper right')
+
+    annual_prec = df['Prec'].resample('A').sum()
+    ax2 =fig.add_axes([0.73, 0.55, 0.25, 0.35])
+    
+    t1 = 'Mean annual rainfall ' + str(np.round(np.mean(annual_prec.values))) + ' mm'    
+    ax2.set_title(t1, fontsize = 14)
+    y_pos = np.arange((len(annual_prec)))
+    plt.bar(y_pos, annual_prec.values, align='center', alpha = 0.5)    
+    plt.xticks(y_pos, annual_prec.index.year, rotation = 45)
+    ax2.set_ylabel('mm')
+
+    zeroline =np.zeros(len(df.index))
+    ax3 = fig.add_axes([0.05,0.08,0.6,0.35])
+    ax3.plot(df.index, df['T'], 'g', linewidth = 0.5)
+    ax3.plot(df.index, zeroline, 'b-')
+    ax3.fill_between(df.index, df['T'],0, where=df['T']<0.0, facecolor='b', alpha=0.3)
+    ax3.fill_between(df.index, df['T'],0, where=df['T']>=0.0, facecolor='r', alpha=0.3)
+    ax3.set_ylabel('Air temperature, $^\circ$ C', fontsize = fs)
+
+    annual_temp = df['T'].resample('A').mean()
+    t2 = 'Mean annual temperature ' + str(np.round(np.mean(annual_temp.values), 2)) + '  $^\circ$ C'    
+    
+    ax4 =fig.add_axes([0.73, 0.08, 0.25, 0.35])
+    ax4.set_title(t2, fontsize = 14)
+    y_pos = np.arange((len(annual_temp)))
+    plt.bar(y_pos, annual_temp.values, align='center', alpha = 0.5)    
+    plt.xticks(y_pos, annual_temp.index.year, rotation = 45)
+    ax4.set_ylabel(' $^\circ$ C', fontsize = fs)
+    plt.show()
