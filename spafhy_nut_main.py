@@ -84,12 +84,12 @@ def nsy(iN, iP, pgen, pcpy, pbu, ptop, pnut, psoil, gisdata, clear_cuts, forcing
         lon= float(gisdata['loc']['lon'])    
         motti = get_Motti_results(pnut['mottisims'], lat, lon)          # retrieve motti parameters
         Nsteps = np.shape(Rm)[0]                                         # number of months in the smulation
-
+        
         print ('Nsteps', Nsteps)
         print ('***************************')
         """ Create nutrient balance object """
         
-        nutSpafhy = Grid_nutrient_balance(forcing, pbu, pgen, pnut, gisdata, \
+        nutSpafhy = Grid_nutrient_balance(Tm.index, pbu, pgen, pnut, gisdata, \
                                           soildata, motti, Wm, ddsm, lat, lon, iN=iN, iP=iP)
         
         for k in range(0, Nsteps):                             
@@ -147,19 +147,38 @@ def nsy(iN, iP, pgen, pcpy, pbu, ptop, pnut, psoil, gisdata, clear_cuts, forcing
         print ('')
         print ('COMPLETED: ', cat  +'  '+ scen)
 
+
+
 scens = ['scen_no_log',
-         'scen_gt_100m','scen_lt_35m']  
-scen = scens[1] 
-cat ='2'
+         'scen_gt_100m','scen_lt_35m']              # predefined logging scenarios
+scen = scens[1]                                     # select one of the scenarios
+cat ='example_catchment'                                            # give the catchment code, the code should be the same as the subfolder name in nutspafhy_inputs 
 outfile = r'C:/Users/alauren/Documents/sve_catchments/Nopt.csv'
 
 print('************************************************')
 print ('****** Catchment: ', cat ,' *******************')
 print('************************************************')
-    
-pgen,pcpy,pbu,ptop=parameters(cat,scen)                         # general, canopy grid, bucket, topmodel
+
+#--------- setup general parameters -------------------------------------
+pgen,pcpy,pbu,ptop=parameters(cat,scen) 
 pnut = nutpara(pgen, cat, scen)
 psoil = soil_properties()
+
+pgen['catchment_id'] = cat
+pgen['start_date'] = '2012-10-01'
+pgen['end_date'] = '2015-11-30'
+pgen['forcing_file'] = 'C:/Users/alauren/OneDrive - University of Eastern Finland/codes/nutspafhy_data/' + cat + '/weather.csv'
+pgen['gis_folder'] = 'C:/Users/alauren/OneDrive - University of Eastern Finland/codes/nutspafhy_data/' + cat +  '/'
+pgen['gis_scenarios'] = 'C:/Users/alauren/OneDrive - University of Eastern Finland/codes/nutspafhy_data/' + cat +  '/' + scen + '/'
+pgen['ncf_file'] = 'C:/Users/alauren/Documents/sve_catchments/spafhy_' + cat + '.nc'
+pgen['output_folder'] = 'C:/Users/alauren/Documents/sve_catchments/'
+#---------- setup nutrient parameters -----------------------
+pnut = nutpara(pgen, cat, scen)
+pnut['mottisims'] = 'C:/Users/alauren/OneDrive - University of Eastern Finland/codes/nutspafhy/stands.p'
+pnut['spafhyfile'] = 'C:/Users/alauren/Documents/sve_catchments/spafhy_' + cat + '.nc'
+pnut['nutspafhyfile'] =  'nutspafhy_' + cat + '.nc'
+#-----------fetch soil parameters ---------------------------------- 
+    
 
 gisdata = create_catchment(pgen, fpath=pgen['gis_folder'],
                                plotgrids=False, plotdistr=False)
@@ -173,6 +192,6 @@ FORC = read_FMI_weather(pgen['catchment_id'],
 
 iN, iP = estimate_imm(gisdata)
 
-outfold =  r'C:/Users/alauren/Documents/sve_catchments/'+ str(int(cat)) + '/' + scen + '/'
+outfold =  r'C:/Users/alauren/Documents/sve_catchments/'
 a = nsy(iN, iP, pgen, pcpy, pbu, ptop, pnut, psoil, gisdata, clear_cuts, FORC, outfold=outfold)
 print ('*******************************') 

@@ -12,13 +12,13 @@ import spafhy_stand as stand
 import matplotlib.pylab as plt
 
 class Grid_nutrient_balance():
-    def __init__(self, forc, pbu, pgen, pnut, gisdata, soildata, motti, Wliq, ddsm, lat, lon, iN=None, iP=None):
+    def __init__(self, timeind, pbu, pgen, pnut, gisdata, soildata, motti, Wliq, ddsm, lat, lon, iN=None, iP=None):
         """
         Dimensions of netCFD (time, longitude, latitude) ie. time, y, x
         """
         print ('****** Initializing Grid nutrient balance instance ********')        
         self.tstep = 0        
-        self.forc=forc        
+        self.timeind=timeind        
         self.pbu = pbu
         self.pgen = pgen
         self.gisdata = gisdata
@@ -30,7 +30,7 @@ class Grid_nutrient_balance():
         self.ddsm = ddsm
         #self.dt = pgen['dt'] / 86400.  # from seconds to days
         self.id = pgen['catchment_id']
-        self.ncf,self.outf=initialize_netCDF_nut(self.id,gisdata,self.forc.index, 
+        self.ncf,self.outf=initialize_netCDF_nut(self.id,gisdata,self.timeind, 
                                    fpath=pgen['output_folder'], fname=pnut['nutspafhyfile'])                 # create output netCDF-file 
 
         start_date = datetime.datetime.strptime(self.pgen['start_date'], '%Y-%m-%d')

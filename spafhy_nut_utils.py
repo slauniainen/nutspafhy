@@ -324,7 +324,7 @@ def initialize_netCDF_nut_bck(ID, gis, forc, fpath='C:\Apps\WinPython-64bit-2.7.
  
     "netCDF file for NutSpathy outputs"    
     
-    from netCDF4 import Dataset, date2num 
+    #from netCDF4 import Dataset, date2num 
     #from datetime import datetime
     
     #dimensions
@@ -352,7 +352,8 @@ def initialize_netCDF_nut_bck(ID, gis, forc, fpath='C:\Apps\WinPython-64bit-2.7.
     lat=ncf.createVariable('lat','f4',('dlat',)); lat.units='ETRS-TM35FIN';
     lon=ncf.createVariable('lon','f4',('dlon',)); lon.units='ETRS-TM35FIN'; 
 
-    tvec=[k.to_datetime() for k in forc.index]    
+    #tvec=[k.to_datetime() for k in forc.index]    
+    tvec = forc.index.to_pydatetime()
     time[:]=date2num(tvec, units=time.units, calendar=time.calendar); 
     lon[:]=gis['lon0']; lat[:]=gis['lat0']
     
@@ -368,7 +369,7 @@ def initialize_netCDF_nut_bck(ID, gis, forc, fpath='C:\Apps\WinPython-64bit-2.7.
 
     return ncf,ff
 
-def initialize_netCDF_nut(ID, gis, tvec, fpath=None, fname=None):
+def initialize_netCDF_nut(ID, gis, tindex, fpath=None, fname=None):
  
     "netCDF file for NutSpathy outputs"    
     
@@ -399,6 +400,9 @@ def initialize_netCDF_nut(ID, gis, tvec, fpath=None, fname=None):
     time = ncf.createVariable('time', 'f8', ('dtime',))
     time.units = "days since 0001-01-01 00:00:00.0"
     time.calendar = 'standard'
+    tvec=tindex.to_pydatetime()
+    time[:] = date2num(tvec, units=time.units, calendar=time.calendar)
+
 
     lat = ncf.createVariable('lat', 'f4', ('dlat',))
     lat.units = 'ETRS-TM35FIN'
@@ -757,6 +761,7 @@ def daily_to_monthly(sp_res, forc, pnut, balance=True):
     ddsm = dd.resample('M', convention='end').sum()
     ddsm = ddsm.cumsum(axis=0)                                              #cumulative temperature sum degree days
     P = forc['Prec'].resample('M', convention ='end').sum()
+    
 
     if balance is False:
         Wm=0; Dm=0; Dretm=0;Tm=0; P=0; Infiltr=0; s_run =0
