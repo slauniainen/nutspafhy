@@ -1694,15 +1694,14 @@ def get_clear_cuts(pgen, cmask):
             ix = np.where(np.isfinite(cmask)) 
             cut2 = cut[ix].copy()
             clear_cuts[key]=cut2
-            print('clear cut dates', key)
     else:
         print ('No available clear-cut scenario rasters in ', pgen['gis_scenarios'])
         key=datetime.date(int(2900),int(12),int(31))
         cut = cmask.copy()
         ix = np.where(np.isfinite(cmask)) 
-        cut[ix]= np.NaN
-        clear_cuts[key]=cut.copy()
-
+        cut2 = cut[ix].copy()
+        cut2[:] = np.NaN
+        clear_cuts[key]=cut2.copy()
     return clear_cuts
 
 def weather_fig(df):
