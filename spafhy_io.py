@@ -1683,8 +1683,8 @@ def get_clear_cuts(pgen, cmask):
     
     clear_cuts ={}
     scens=[f for f in os.listdir(pgen['gis_scenarios']) if f.endswith('.asc')]
-    for s in scens:
-        try:
+    if scens:
+        for s in scens:
             m = s[4:6]        
             yr = s[:4]
             days = monthrange(int(yr), int(m))   #locate cuttings to the last day of month
@@ -1695,14 +1695,13 @@ def get_clear_cuts(pgen, cmask):
             cut2 = cut[ix].copy()
             clear_cuts[key]=cut2
             print('clear cut dates', key)
-        except:
-            print ('No available clear-cut scenario rasters in ', pgen['gis_scenarios'])
-            key=datetime.date(int(2900),int(12),int(31))
-            cut = np.empty(np.size(cmask))
-            cut[:]=np.NaN
-            ix = np.where(np.isfinite(cmask)) 
-            cut2 = cut[ix].copy()
-            clear_cuts[key]=cut2
+    else:
+        print ('No available clear-cut scenario rasters in ', pgen['gis_scenarios'])
+        key=datetime.date(int(2900),int(12),int(31))
+        cut = cmask.copy()
+        ix = np.where(np.isfinite(cmask)) 
+        cut[ix]= np.NaN
+        clear_cuts[key]=cut.copy()
 
     return clear_cuts
 
