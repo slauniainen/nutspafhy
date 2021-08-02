@@ -1697,6 +1697,12 @@ def get_clear_cuts(pgen, cmask):
             print('clear cut dates', key)
         except:
             print ('No available clear-cut scenario rasters in ', pgen['gis_scenarios'])
+            key=datetime.date(int(2900),int(12),int(31))
+            cut = np.empty(np.size(cmask))
+            cut[:]=np.NaN
+            ix = np.where(np.isfinite(cmask)) 
+            cut2 = cut[ix].copy()
+            clear_cuts[key]=cut2
 
     return clear_cuts
 

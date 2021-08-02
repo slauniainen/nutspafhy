@@ -151,7 +151,7 @@ def nsy(iN, iP, pgen, pcpy, pbu, ptop, pnut, psoil, gisdata, clear_cuts, forcing
 
 scens = ['scen_no_log',
          'scen_gt_100m','scen_lt_35m']              # predefined logging scenarios
-scen = scens[1]                                     # select one of the scenarios
+scen = scens[0]                                     # select one of the scenarios
 cat ='example_catchment'                                            # give the catchment code, the code should be the same as the subfolder name in nutspafhy_inputs 
 outfile = r'C:/Users/alauren/Documents/sve_catchments/Nopt.csv'
 
